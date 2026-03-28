@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>My Collections</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; font-family: Arial, sans-serif; }
+  body { display:flex; flex-direction:column; height:100vh; background:#d4d4d8; }
+  header { height:120px; width: 100%; background:#d4d4d8; color:white; display:flex; align-items:center; justify-content: flex-start; padding:0 20px; position: relative;}
+  
+  .left-section {display: flex; align-items: center; gap: 10px;}
+  .menu-icon { font-size:30px; color:#2e56a8; cursor:pointer; margin-right:15px; }
+  .logo {height: 95px;width: auto;object-fit: contain;}
+  
+  .tagline {position: absolute;left: 50%;transform: translateX(-50%);max-height: 25px;height: auto;}
+  
+  .right-section {margin-left: auto;display: flex;gap: 10px;align-items: center;}
+  .right-section button {padding: 8px 14px;border-radius: 20px;border: none;cursor: pointer;font-size: 14px;transition: all 0.2s ease;}
+  .login-btn {background: transparent;color: #2e56a8;border: 1px solid #2e56a8;}
+  .login-btn:hover {background: #2e56a8;color: white;}
+  .signup-btn {background: #2e56a8;color: white;}
+  .signup-btn:hover {background: #2b4477;}
+
+  /* like and complete buttons */
+  .like-btn {background: none;border: none;cursor: pointer;padding: 8px;border-radius: 50%;display: flex;align-items: center;justify-content: center;transition: background 0.2s;}
+  .like-btn:hover {background: rgba(255, 100, 100, 0.1);}
+  .like-btn svg {width: 32px;height: 32px;fill: none;stroke: lightcoral;stroke-width: 2;transition: fill 0.2s, transform 0.2s;}
+  .like-btn:hover svg {fill: lightcoral;transform: scale(1.15);}
+  .like-btn.liked svg {fill: lightcoral;stroke: lightcoral;}
+  .like-btn:active svg {transform: scale(0.95);}
+  .complete-btn {background: none;border: none;cursor: pointer;padding: 8px;border-radius: 50%;display: flex;align-items: center;justify-content: center;transition: background 0.2s;}
+  .complete-btn:hover {background: rgb(41, 154, 63);}
+  .complete-btn svg {width: 40px;height: 40px;fill: transparent;stroke: rgb(41, 154, 63);stroke-width: 1.3;transition: all 0.2s ease;}
+  .complete-btn:hover svg {fill: rgb(41, 154, 63);stroke: rgb(41, 154, 63);transform: scale(1.15);}
+  .complete-btn.completed svg {fill: rgb(41, 154, 63);stroke: rgb(41, 154, 63);}
+  .complete-btn:active svg {transform: scale(0.95);}
+
+  header h1 { font-size:20px; }
+  .layout { display:flex; flex:1; overflow:hidden; }
+  .sidebar { width:220px; background:#d4d4d8; color:white; padding:20px 10px; display:flex; flex-direction:column; transition:width 0.3s ease; flex-shrink:0; }
+  .sidebar.closed { width:0; padding:20px 0; overflow:hidden; }
+  .sidebar button { display:flex; align-items:center; width:100%; margin-bottom:10px; padding:10px; border:none; background:#2e56a8; color:white; cursor:pointer; text-align:left; }
+  .sidebar button:hover { background:#2b4474; }
+  .main { flex:1; padding:20px; overflow-y:auto; transition:all 0.3s ease; }
+  .filters { margin-bottom:20px; display:flex; flex-wrap:wrap; gap:10px; }
+  .filter-btn { padding:8px 16px; border:none; border-radius:20px; cursor:pointer; background:#ddd; color:#333; transition:all 0.2s ease; }
+  .filter-btn.active { background:#2e56a8; color:white; }
+  .card-container { display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:15px; }
+  .card { background:white; padding:15px; border-radius:8px; box-shadow:0 2px 5px rgba(0,0,0,0.1); }
+  .card h3 { margin-bottom:10px; }
+  .card p { font-size:14px; margin-bottom:10px; }
+  .card button { padding:6px 10px; border:none; background:white;  cursor:pointer; border-radius:4px; }
+  .card button:hover { background:#b0b9c8; }
+
+</style>
+</head>
+<body>
+
+<header>
+  <div class="left-section">
+    <div class="menu-icon" onclick="toggleSidebar()">☰</div>
+    <img src="logo_grey.jpg" alt="LifeMax Logo" class="logo">
+  </div>
+  <img src="tagline_grey.jpg" alt="Tagline" class="tagline">
+  <div class="right-section">
+    <button class="login-btn" onclick="window.location.href='login.html'">Log In</button>
+    <button class="signup-btn" onclick="window.location.href='signup.html'">Sign Up</button>
+  </div>
+</header>
+
+<div class="layout">
+  <div class="sidebar closed" id="sidebar">
+    <button onclick="window.location.href='base.html'">Home</button>
+    <button>Weekly Quests</button>
+    <button>Settings</button>
+  </div>
+
+  <div class="main" id="mainContent">
+    <!-- filters -->
+    <div class="filters" id="filters">
+      <button class="filter-btn active" data-filter="liked">❤️ Liked</button>
+      <button class="filter-btn" data-filter="completed">✅ Completed</button>
+    </div>
+
+    <template id="card-template">
+      <div class="card" data-category="">
+        <h3 class="card-title"></h3>
+        <div class="card-footer" style="margin-top: 10px;">
+          <button class="like-btn">
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+            </svg>
+          </button>
+          <button class="complete-btn">
+            <svg viewBox="0 0 24 24">
+              <path d="M9 16.2l-3.5-3.5L4 14.2l5 5 11-11-1.5-1.5z"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </template>
+
+    <div class="card-container" id="cardContainer">
+      <!-- cards injected here -->
+    </div>
+  </div>
+</div>
+
+<script>
+const sidebar = document.getElementById('sidebar');
+function toggleSidebar(){ sidebar.classList.toggle('closed'); }
+
+// filters logic
+const filters = document.querySelectorAll('.filter-btn');
+const cardContainer = document.getElementById('cardContainer');
+
+filters.forEach(btn => {
+  btn.addEventListener('click', () => {
+    filters.forEach(f => f.classList.remove('active'));
+    btn.classList.add('active');
+    updateCards();
+  });
+});
+
+// show only liked/completed
+function updateCards(){
+  const activeFilter = document.querySelector('.filter-btn.active').dataset.filter;
+  const cards = document.querySelectorAll('.card');
+
+  cards.forEach(card => {
+    if(activeFilter === "liked"){
+      card.style.display = card.dataset.liked === "true" ? "block" : "none";
+    } else if(activeFilter === "completed"){
+      card.style.display = card.dataset.completed === "true" ? "block" : "none";
+    }
+  });
+}
+
+// card generator
+function addCardFromBackend(data) {
+  const template = document.getElementById('card-template');
+  const clone = template.content.cloneNode(true);
+  const cardDiv = clone.querySelector('.card');
+  const title = clone.querySelector('.card-title');
+
+  cardDiv.dataset.category = data.categories.join(',');
+  cardDiv.dataset.liked = data.liked || "false";
+  cardDiv.dataset.completed = data.completed || "false";
+
+  title.textContent = data.title;
+
+  const likeBtn = clone.querySelector(".like-btn");
+  if(cardDiv.dataset.liked === "true") likeBtn.classList.add("liked");
+  likeBtn.addEventListener("click", () => {
+    const isLiked = cardDiv.dataset.liked === "true";
+    cardDiv.dataset.liked = (!isLiked).toString();
+    likeBtn.classList.toggle("liked");
+  });
+
+  const completeBtn = clone.querySelector(".complete-btn");
+  if(cardDiv.dataset.completed === "true") completeBtn.classList.add("completed");
+  completeBtn.addEventListener("click", () => {
+    const isCompleted = cardDiv.dataset.completed === "true";
+    cardDiv.dataset.completed = (!isCompleted).toString();
+    completeBtn.classList.toggle("completed");
+  });
+
+  cardContainer.appendChild(clone);
+  updateCards();
+}
+
+// simulate backend data
+const backendData = [
+  {title:"Try a New Recipe", categories:["creative"], liked:"true"},
+  {title:"Watch a Film", categories:["entertainment"], completed:"true"},
+  {title:"Meditation Session", categories:["mindful"], liked:"true", completed:"true"},
+  {title:"Learn Origami", categories:["creative","learning"], liked:"true"}
+];
+
+backendData.forEach(d => addCardFromBackend(d));
+</script>
+
+</body>
+</html>
