@@ -113,10 +113,16 @@ document.querySelector(".save-button").addEventListener("click", () => {
     const selected_hobbies = [...document.querySelectorAll("#hobby-button-container .option-btn.selected")]
         .map(btn => btn.textContent);
 
-    console.log("Music:", selected_music);
-    console.log("Books:", selected_books);
-    console.log("Movies:", selected_movies);
-    console.log("Cuisines:", selected_cuisines);
-    console.log("Dietary:", selected_dietary);
-    console.log("Hobbies:", selected_hobbies);
+    fetch("/save-preferences", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            music:    selected_music,
+            books:    selected_books,
+            movies:   selected_movies,
+            cuisines: selected_cuisines,
+            dietary:  selected_dietary,
+            hobbies:  selected_hobbies
+        })
+    });
 });
