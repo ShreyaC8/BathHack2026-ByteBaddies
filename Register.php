@@ -1,4 +1,7 @@
 <?php
+header("Access-Control-Allow-Origin: http://127.0.0.1:5000");
+header("Access-Control-Allow-Methods: POST");
+header("Access-Control-Allow-Headers: Content-Type");
 $servername = "sql8.freesqldatabase.com";
 $username = "sql8821562";
 $password = "xMe77Ghi88";
@@ -38,7 +41,7 @@ while ($count<$maxCount){
         sleep(3);// waits 3 seconds before retrying 
     }
         else {
-        echo "Connection successful"."<br>" ; // if connection successful then database can be accessed and we can make querys.
+        //echo "Connection successful"."<br>" ; // if connection successful then database can be accessed and we can make querys.
         $sql =  "SELECT UserName FROM users WHERE UserName = ? OR Email =?";
         // writes query to select the data in the fields in the table users.
         $statement =$conn->prepare($sql); // the sql is being prepared using this command
@@ -56,10 +59,13 @@ while ($count<$maxCount){
             $statement = $conn->prepare($sql);
             $statement->bind_param("sss", $UserLogin, $hashedPassword, $LoginEmail);
             if ($statement-> execute()){
-                echo " New user created successfully";
+                //echo " New user created successfully";
+                echo json_encode(["status" => "success"]);
+                exit();
             }
             else{
-                echo"Error:".$statement->error;
+                echo json_encode(["status" => "error", "message" => $statement->error]);
+                exit();
             }
         }
         $statement->close();
