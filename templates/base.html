@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <title>side quests</title>
 <style>
-  * { margin:0; padding:0; box-sizing:border-box; font-family: Arial, sans-serif; }
+  * { margin:0; padding:0; box-sizing:border-box; font-family: Lucida Bright, serif; }
   body { display:flex; flex-direction:column; height:100vh; background:#d4d4d8; }
   header { height:120px; width: 100%; background:#d4d4d8; color:white; display:flex; align-items:center; justify-content: flex-start; padding:0 20px; position: relative;}
   
@@ -237,15 +237,6 @@ async function loadRecommendations() {
 }
 
 loadRecommendations();
-
-// load more backend cards dynamically
-const mainContent = document.getElementById('mainContent');
-mainContent.addEventListener('scroll', () => {
-  if(mainContent.scrollTop + mainContent.clientHeight >= mainContent.scrollHeight - 10){
-    // call backend API and pass data to addCardFromBackend
-    addCardFromBackend({title:"Learn a New Skill", categories:["learning"]});
-  }
-});
 </script>
 
 </body>
